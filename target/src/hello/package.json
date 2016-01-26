@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "name": "hello",
+  "main": "./hello.server.js",
+  "browser": "./hello.client.js"
+}
