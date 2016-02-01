@@ -2,5 +2,9 @@
 
  - https://webpack.github.io/docs/configuration.html#module
 
-`npm run build`
+
+# Build
+
+ - `npm run build` is for development
+ - `npm run build -- --release` is for production
 
