@@ -6,5 +6,5 @@
 # Build
 
  - `npm run build` is for development
- - `npm run build -- --release` is for production
+ - `env NODE_ENV='production' npm run build` is for production on fish shell.
 

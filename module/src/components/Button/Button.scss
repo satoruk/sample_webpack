@@ -1,7 +1,8 @@
 .root {
-  padding: 10px;
-  border: solid 1px #ccc;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
   -moz-transform: scale(0.6);
+  -webkit-border-radius: 5px; // Will remove by autoprefixer
+  border-radius: 5px;
+  border: solid 1px #ccc;
+  padding: 10px;
+  background-color: #eee;
 }

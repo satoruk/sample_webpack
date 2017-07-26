@@ -3,8 +3,9 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import path from 'path';
 import webpack from 'webpack';
 
-const DEBUG = !process.argv.includes('--release');
-const VERBOSE = process.argv.includes('--verbose');
+const ENV = process.env.NODE_ENV || 'development';
+const DEBUG = ENV === 'development';
+
 const AUTOPREFIXER_BROWSERS = [
   'Android 2.3',
   'Android >= 4',
@@ -37,7 +38,7 @@ const cssLoaderParam = {
   sourceMap: false,
   minimize: true,
   localIdentName: '[hash:base64:5]',
-  importLoaders: 1
+  importLoaders: 1,
 };
 if (DEBUG) {
   Object.assign(cssLoaderParam, {
@@ -52,7 +53,6 @@ console.log(toLoaderParam(cssLoaderParam));
 
 const clientConfig = {
   cache: DEBUG,
-  debug: DEBUG,
   // devtool: DEBUG ? 'cheap-module-eval-source-map' : false,
   devtool: DEBUG ? 'source-map' : false,
   entry: {
@@ -63,25 +63,48 @@ const clientConfig = {
     filename: '[name].js'
   },
   module: {
-    loaders: [
-      { test: /\.js$/, loader: 'babel' },
+    rules: [
+      {
+        test: /\.js$/,
+        use: [
+          {
+            loader: 'babel-loader',
+            // options: {
+            //   presets: [
+            //     ['env', {'modules': false}]
+            //   ],
+            // },
+          }
+        ],
+      },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract(
-          'style-loader',
-          `css-loader?${toLoaderParam(cssLoaderParam)}!postcss-loader`
-        )
-      }
-    ]
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            {
+              loader: 'css-loader',
+              options: cssLoaderParam,
+            },
+            {
+              loader: 'postcss-loader',
+              options: {
+                plugins: (loader) => [
+                  require('autoprefixer')({ browsers: AUTOPREFIXER_BROWSERS }),
+                ],
+              },
+            },
+          ],
+        }),
+      },
+    ],
   },
-  postcss: [
-    require('autoprefixer')({ browsers: AUTOPREFIXER_BROWSERS })
-  ],
   resolve: {
-    modulesDirectories: ['node_modules', 'components']
+    modules: ['node_modules', 'components'],
   },
   plugins: [
     new webpack.DefinePlugin(GLOBALS),
+    new webpack.LoaderOptionsPlugin({ debug: DEBUG }),
     new ExtractTextPlugin('style.css', { allChunks: true })
   ]
 };
